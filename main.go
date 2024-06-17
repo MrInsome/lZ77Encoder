@@ -12,19 +12,16 @@ func lz77Encode(dictionarySize, bufferSize int, text string) {
 	var dictionary, buffer []rune
 
 	for step := 1; len(text) > 0 || len(buffer) > 0; step++ {
-		// Обрезать словарь, если он превышает размер
 		if len(dictionary) > dictionarySize {
 			dictionary = dictionary[len(dictionary)-dictionarySize:]
 		}
 
-		// Заполнить буфер предпросмотра
 		for len(text) > 0 && len(buffer) < bufferSize {
 			r, size := utf8.DecodeRuneInString(text)
 			buffer = append(buffer, r)
 			text = text[size:]
 		}
 
-		// Поиск наибольшего совпадения
 		maxMatchLength, maxMatchIndex := 0, -1
 		for i := 0; i <= len(dictionary); i++ {
 			matchLength := 0
@@ -40,13 +37,11 @@ func lz77Encode(dictionarySize, bufferSize int, text string) {
 			}
 		}
 
-		// Вывод результатов и обновление буферов
 		fmt.Printf("Шаг %d: ", step)
 		fmt.Printf("Словарь: %v ", string(dictionary))
 		fmt.Printf("Буфер: %v ", string(buffer))
 
 		if maxMatchLength > 0 && maxMatchLength <= len(buffer) {
-			// Вычисление правильного индекса для вывода
 			correctIndex := (dictionarySize - len(dictionary) + maxMatchIndex) % dictionarySize
 			fmt.Printf("<%d,%d,%s>\n", correctIndex, maxMatchLength, string(buffer[maxMatchLength-1]))
 			dictionary = append(dictionary, buffer[:maxMatchLength]...)
